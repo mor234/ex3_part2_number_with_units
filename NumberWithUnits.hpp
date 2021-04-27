@@ -1,7 +1,8 @@
 /**
  * @file NumberWithUnits.hpp
  * @author mor234
- * @brief 
+ * @brief declaration of class NumberWithUnits
+ * Was done as an exercise in course in cpp
  * @version 0.1
  * @date 2021-04-25
  * 
@@ -11,7 +12,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <map>
 
 namespace ariel {
@@ -19,7 +19,7 @@ namespace ariel {
     class NumberWithUnits {
     private:
         //variables
-        static std::map<std::string, std::map<std::string, double>> units_convertions;
+        static std::map <std::string, std::map<std::string, double>> units_convertions;
         constexpr static const double EPS = 0.001;
         double num;
         std::string unit_type;
@@ -29,20 +29,17 @@ namespace ariel {
 
         bool is_convertable(const NumberWithUnits &otherNum) const;
 
-        static void update_units(const std::string & unit1, const std::string & unit2, double unit1_to_unit2);
+        static void update_units(const std::string &unit1, const std::string &unit2, double unit1_to_unit2);
 
-        static bool remove_spaces_and_bracket(std::string & str);
+        static bool remove_spaces_and_bracket(std::string &str);
 
 
     public:
-       // NumberWithUnits() {};
-
         NumberWithUnits(const NumberWithUnits &other);
 
-        NumberWithUnits(const double & num, const std::string & unit);
+        NumberWithUnits(const double &num, const std::string &unit);
 
-        void print_units() const;
-
+        static void print_units();
 
         static void read_units(std::ifstream &units_file);
         //-------------------------------------
@@ -90,7 +87,9 @@ namespace ariel {
 
         friend NumberWithUnits operator*(const double &otherDoubleNum, const NumberWithUnits &otherNum);
 
+        //----------------------------------
         //Comparison operators
+        //----------------------------------
         bool operator<(const NumberWithUnits &otherNum) const;
 
         bool operator>(const NumberWithUnits &otherNum) const;

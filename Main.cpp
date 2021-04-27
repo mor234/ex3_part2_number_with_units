@@ -1,63 +1,75 @@
-/**
- * Demo file for the exercise on numbers with units
- *
- * @author Erel Segal-Halevi
- * @since 2019-02
- */
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-using namespace std;
-
 #include "NumberWithUnits.hpp"
-using namespace ariel;
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
+
+
+using namespace ::std;
+using namespace ::ariel;
+
+void create_my_units_file() {
+    ofstream units_file;
+    units_file.open("my_units.txt");
+    units_file << "1 BTC = 54926 USD" << endl;
+    units_file << "1 ETH = 2629 USD" << endl;
+    units_file << "1 USD = 3.33 ILS" << endl;
+    units_file << "1 hour = 60 min" << endl;
+    units_file << "1 min = 60 sec" << endl;
+    units_file << "1 day = 24 hour" << endl;
+    units_file.close();
+}
 
 int main() {
-  ifstream units_file{"my_units.txt"};
-  NumberWithUnits::read_units(units_file);
+    create_my_units_file();
+    ifstream units_file_stream{"my_units.txt"};
+    NumberWithUnits::read_units(units_file_stream);
+    cout << "[̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅]";
+    cout << endl << endl;
+    cout << "       --------Welcome to the Moriya Crypto Trading Unit!-------";
+    cout << endl << endl;
+    cout << "[̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅]";
+    cout << endl << endl;
+    cout << "===================================================" << endl;
 
-  NumberWithUnits a{2, "km"};   // 2 kilometers
-  cout << a << endl;           // Prints "2[km]".
-  cout << (-a) << endl;    // Prints "-2[km]"
-  cout << (3*a) << endl;    // Prints "6[km]"
+    NumberWithUnits
+            hour(6, "hour"),
+            day2(0.125, "day"),
+            min(3.25, "min"),
+            day(0.5, "day"),
+            sec(195, "sec"),
+            usd(32, "USD"),
+            eth(20, "ETH"),
+            ils(3.2, "ILS"),
+            btc(15, "BTC");
 
-  NumberWithUnits b{300, "m"};  // 300 meters
-  cout << (a+b) << endl;   // Prints "2.3[km]". Note: units are determined by first number (a).
-  cout << (b-a) << endl;   // Prints "-1700[m]". Note: units are determined by first number (b).
+    cout << endl << "Calculations examples:" << endl << endl;
+    cout << "    " << ils << " + " << ils << " = " << ils + ils << endl << endl;
+    cout << "    " << eth << " += " << btc << " = " << (eth += btc) << endl << endl;
+    cout << "    " << eth << " - " << usd << " = " << eth - usd << endl << endl;
+    cout << "    " << hour << " - " << day2 << " = " << hour - day2 << endl << endl;
+    cout << "    " << 109 << " * " << btc << " = " << (109 * btc) << endl << endl;
+    cout << "    " << day << " ++ " << "= " << day++ << endl << endl;
+    try {
+        cout << "    " << day << "+" << ils << " = " << day + ils << endl << endl;
+    }
+    catch (exception &ex) {
+        cout << ex.what() << endl << endl;
+    }
 
-  cout << boolalpha; // print booleans as strings from now on:
-  cout << (a>b) << endl;  // Prints "true"
-  cout << (a<=b) << endl;  // Prints "false"
-  cout << (a==NumberWithUnits{2000, "sec"}) << endl;  // Prints "true"
+    cout << "===================================================" << endl;
+    cout << endl << "Comperation examples:" << endl << endl;
+    cout << boolalpha;
 
-  istringstream sample_input1{"700[ kg]"};
-  sample_input1 >> a;
-  cout << a << endl;   // Prints "700[kg]"
-  istringstream sample_input2{"800 [kg]"};
-  sample_input2 >> a;
-  cout << a << endl;   // Prints "800[kg]"
-  istringstream sample_input3{"900[ kg ]"};
-  sample_input3 >> a;
-  cout << a << endl;   // Prints "900[kg]"
-
-  istringstream sample_input4{"1000[kg] 500[kg]"};
-  sample_input4 >>a>>b;   
-  cout << a <<b<< endl;   // Prints "1000[kg]"
-
-
-  // cout << a << endl;   // Prints "700[kg]"
-  // cout << (a += NumberWithUnits{1, "ton"}) << endl;  // prints "1700[kg]"
-  // cout << a << endl;   // Prints "1700[kg]". Note that a has changed.
-
-  // try {
-  //   cout << (a+b) << endl;  
-  // } catch (const std::exception& ex) {
-  //   cout << ex.what() << endl; // Prints "Units do not match - [m] cannot be converted to [kg]"
-  // }
-  
+    cout << "    (" << min << " == " << sec << ") = " << (min == sec) << endl << endl;
+    cout << "    (" << day << " != " << hour << ") = " << (day != hour) << endl << endl;
+    cout << "    (" << ils << " > " << btc << ") = " << (ils > btc) << endl << endl;
 
 
-  return 0;
+    cout << "===================================================" << endl << endl;
+    cout << "The conversion data base:" << endl;
+    NumberWithUnits::print_units();
+    cout << "===================================================" << endl;
+
+
 }
