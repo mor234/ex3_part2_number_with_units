@@ -29,14 +29,20 @@ namespace ariel {
 
         bool is_convertable(const NumberWithUnits &otherNum) const;
 
-        static void update_units(std::string unit1, std::string unit2, double unit1_to_unit2);
+        static void update_units(const std::string & unit1, const std::string & unit2, double unit1_to_unit2);
+
+        static bool remove_spaces_and_bracket(std::string & str);
+
 
     public:
-        NumberWithUnits() {};
+       // NumberWithUnits() {};
 
         NumberWithUnits(const NumberWithUnits &other);
 
-        NumberWithUnits(double num, std::string unit);
+        NumberWithUnits(const double & num, const std::string & unit);
+
+        void print_units() const;
+
 
         static void read_units(std::ifstream &units_file);
         //-------------------------------------

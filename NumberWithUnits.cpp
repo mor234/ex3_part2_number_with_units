@@ -11,8 +11,10 @@
 
 #include "NumberWithUnits.hpp"
 #include <fstream>
-#include<sstream>
-#include <string>
+#include <bits/stdc++.h>
+#include <stdexcept>
+
+
 
 
 
@@ -21,10 +23,10 @@ using namespace std;
 namespace ariel {
     std::map<std::string, std::map<std::string, double>>  NumberWithUnits::units_convertions;
 
-    NumberWithUnits::NumberWithUnits(double num, string unit) {
+    NumberWithUnits::NumberWithUnits(const double & num, const string & unit) {
         if (!units_convertions.contains(unit))//hasn't found
         {
-            throw "Error. The unit type doesn't exist in the class.";
+            throw std::"Error. The unit type doesn't exist in the class.";
         }
         this->num = num;
         this->unit_type = unit;
@@ -42,9 +44,9 @@ namespace ariel {
      * @param unit2 
      * @param unit1_to_unit2 
      */
-     void NumberWithUnits::update_units(string unit1, string unit2, double unit1_to_unit2)
+     void NumberWithUnits::update_units(const string & unit1, const string & unit2, double unit1_to_unit2)
      {
-        for (auto pair:units_convertions[unit1]) {
+        for (auto const & pair:units_convertions[unit1]) {
             /**
              * @brief 
              * m= 100 cm, m=0.001 km  ->   km= 100/0.001 cm 
@@ -56,21 +58,37 @@ namespace ariel {
             units_convertions[unit2][pair.first] = pair.second/unit1_to_unit2;
         }
     }
+    //got help from a friend
+    void  NumberWithUnits::print_units() const
+    {
+        for (auto it = units_convertions.begin(); it != units_convertions.end();++it) 
+        {
+            cout << it->first<<":"<<endl;
+            auto inside_map=it->second;
+            for (auto it2 =  inside_map.begin(); it2 != inside_map.end(); ++it2) {
+                cout << " <" << it2->first << " , " << it2->second << "> " ;
+            }
+            cout<<endl;
+        }
+    }
 
     void NumberWithUnits::read_units(ifstream &units_file) {
 
         if (!units_file) {
             throw "error opening input file\n";
         }
-        int one;
+        int one=0;
         string unit1;
         string equal_sign;
-        double number;
+        double number=0;
         string unit2;
         while (!units_file.eof()) {
             units_file >> one >> unit1 >> equal_sign >> number >> unit2;
             //number not suppose to be zero
-
+            if(number==0)
+            {
+                throw "Error. The number is not suppose to be zero";
+            }
             update_units(unit1, unit2, number);
             update_units(unit2, unit1, 1/number);
 
@@ -79,19 +97,8 @@ namespace ariel {
 
 
         }
-        units_file.close();//need to?
-        for (map < string, map < string, double >> ::iterator it = units_convertions.begin(); it !=
-                                                                                              units_convertions.end();
-        ++it) {
-            cout << it->first<<":"<<endl;
-            map<string, double> internal_map = it->second;
-            for (map<string, double>::iterator it2 = internal_map.begin(); it2 != internal_map.end(); ++it2) {
-                cout << " <" << it2->first << " , " << it2->second << " > " ;
-            }
-            cout<<endl;
-        }
-
-
+        units_file.close();
+ 
     }
     //-------------------------------------
     // operators
@@ -146,12 +153,9 @@ namespace ariel {
      * @return double 
      */
     double NumberWithUnits::convert_to_this_unit(const NumberWithUnits &otherNum) const {
-        double converted_number;
-        if (this->unit_type==otherNum.unit_type)
+        double converted_number=1;
+        if (!(this->unit_type==otherNum.unit_type))
         {
-            converted_number=1;
-        }
-        else{
             converted_number=units_convertions[otherNum.unit_type][this->unit_type];
         }
         return otherNum.num*converted_number;
@@ -220,6 +224,17 @@ namespace ariel {
 
 
     //Comparison operators
+    bool NumberWithUnits::operator==(const NumberWithUnits &otherNum) const {
+        if (!is_convertable(otherNum)) {
+            throw "Error. The units types are from different dimensions and can't be compared.";
+        }
+
+        return abs(this->num-convert_to_this_unit(otherNum))<=EPS;
+    }
+
+    bool NumberWithUnits::operator!=(const NumberWithUnits &otherNum) const {
+        return !(*this == otherNum);
+    }
     bool NumberWithUnits::operator<(const NumberWithUnits &otherNum) const {
         if (!is_convertable(otherNum)) {
             throw "Error. The units types are from different dimensions and can't be compared.";
@@ -232,23 +247,11 @@ namespace ariel {
     }
 
     bool NumberWithUnits::operator<=(const NumberWithUnits &otherNum) const {
-        return !((*this) > otherNum);
+        return ((*this) < otherNum)  || ((*this)==otherNum);
     }
 
     bool NumberWithUnits::operator>=(const NumberWithUnits &otherNum) const {
-        return !(*this < otherNum);
-    }
-
-    bool NumberWithUnits::operator==(const NumberWithUnits &otherNum) const {
-        if (!is_convertable(otherNum)) {
-            return false;
-        }
-
-        return abs(this->num-convert_to_this_unit(otherNum))<=EPS;
-    }
-
-    bool NumberWithUnits::operator!=(const NumberWithUnits &otherNum) const {
-        return !(*this == otherNum);
+        return ((*this) > otherNum)  || ((*this)==otherNum);
     }
 
 
@@ -259,31 +262,73 @@ namespace ariel {
         output << num.num << '[' << num.unit_type << ']';
         return output;
     }
-
+    /**
+     * @brief 
+     * 
+     * @param str 
+     * @return true 
+     * @return false 
+     */
+    bool NumberWithUnits::remove_spaces_and_bracket(string & str)
+    {
+        string::size_type i=0;
+        bool first_bracket_left=true;
+        //remove spaces from the start and '[' once
+        while(i<str.size()&&(str[i]==' '||(first_bracket_left&&(str[i]=='['))))  
+        {
+            if(first_bracket_left&&(str[i]=='['))
+            {
+                first_bracket_left=false;
+            }
+           
+            i++;
+        }
+        str.erase(0,i);
+        i=str.size()-1;
+        bool first_bracket_right=true;
+        // remove spaces from the end and ']' once
+        while( i>=0 && (str[i]==' '|| ( first_bracket_right && (str[i]==']') ) ) )  
+        {
+            if(first_bracket_right&&(str[i]==']'))
+            {
+                first_bracket_right=false;
+            }
+            str.pop_back();
+            i--;
+        }
+        return (!first_bracket_left&&!first_bracket_right);//both appeared already  
+    }
+ 
     std::istream &operator>>(std::istream &input, NumberWithUnits &num)//
     {
-        const char LEFT_BRACKET = '[';
-        const char RIGHT_BRACKET = ']';
-        char left_bracket_input, right_bracket_input;
-        double input_num;
+        string input_unit_1,input_unit_2,input_unit_3;
         string input_unit;
+        double input_num=0;
 
-        input >> input_num >>input_unit;
+        input>>input_num>>input_unit_1;
+        if(input_unit_1[input_unit_1.size()-1]!=']')
+        {
+            input>>input_unit_2;
+            if(input_unit_2[input_unit_2.size()-1]!=']')
+            {
+                input>>input_unit_3;
+            }
+        }
 
-        istringstream iss(string);     //object 'iss' created
-        string str;
-        iss >> str;       
-        
-        // if (iss)
-        // {
-        //     throw "Error. Wrong input format.";
-        // }
-        if (left_bracket_input != LEFT_BRACKET || right_bracket_input != RIGHT_BRACKET) {
+        input_unit=input_unit_1+" "+input_unit_2+" "+input_unit_3;
+
+        bool good_bracket_format=NumberWithUnits::remove_spaces_and_bracket(input_unit);
+        if(!good_bracket_format) //input one is empty
+        {
             throw "Error. Wrong input format.";
         }
         if (!(NumberWithUnits::units_convertions.contains(input_unit))) {
             throw "Error. The given unit type does not exist. ";
         }
+
+        num.num=input_num;
+        num.unit_type=input_unit;
+
         return input;
     }
 }
