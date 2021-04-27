@@ -26,7 +26,7 @@ namespace ariel {
     NumberWithUnits::NumberWithUnits(const double & num, const string & unit) {
         if (!units_convertions.contains(unit))//hasn't found
         {
-            throw std::"Error. The unit type doesn't exist in the class.";
+            throw "Error. The unit type doesn't exist in the class.";
         }
         this->num = num;
         this->unit_type = unit;
