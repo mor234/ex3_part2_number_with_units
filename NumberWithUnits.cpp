@@ -272,7 +272,7 @@ namespace ariel {
 
         istringstream iss(string);     //object 'iss' created
         string str;
-        // iss >> str;       
+        iss >> str;       
         
         // if (iss)
         // {
