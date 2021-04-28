@@ -146,7 +146,7 @@ namespace ariel {
      * @return NumberWithUnits& -reference to the object after the change
      */
     NumberWithUnits &NumberWithUnits::operator++() {
-        (this->num) += 1;
+        (this->num) ++;
         return *this;
     }
 
@@ -176,7 +176,7 @@ namespace ariel {
      * @return NumberWithUnits& -reference to the object after the change
      */
     NumberWithUnits &NumberWithUnits::operator--() {
-        this->num -= 1;
+        (this->num) --;
         return *this;
     }
 
